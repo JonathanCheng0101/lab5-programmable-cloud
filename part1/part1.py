@@ -44,7 +44,7 @@ def wait_for_operation(op, zone=None):
 
         if result['status'] == 'DONE':
             if 'error' in result:
-                pprint(result['error'])
+                print(result['error'])
                 raise SystemExit("Operation failed")
             return
         time.sleep(2)
