@@ -54,9 +54,11 @@ def create_firewall_rule():
         'targetTags': ['allow-5000'],
         'allowed': [{'IPProtocol': 'tcp', 'ports': ['5000']}],
     }
-    op = service.firewalls().insert(
-        project=project, body=firewall_body).execute()
-    wait_for_operation(op)
+    try:
+        op = service.firewalls().insert(project=project, body=firewall_body).execute()
+        wait_for_operation(op)
+    except Exception as e:
+        print("Firewall allow-5000 already exists, skip.")
 
 def create_instance():
     image = service.images().getFromFamily(
