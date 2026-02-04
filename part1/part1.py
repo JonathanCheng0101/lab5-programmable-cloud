@@ -9,7 +9,7 @@ service = googleapiclient.discovery.build('compute', 'v1', credentials=credentia
 
 ZONE = 'us-west1-b'
 INSTANCE_NAME = 'flask-vm'
-MACHINE_TYPE = 'e2-medium'   #  f1-micro
+MACHINE_TYPE = 'e2-standard-2'   #  f1-micro
 
 STARTUP_SCRIPT = """#!/bin/bash
 set -e
