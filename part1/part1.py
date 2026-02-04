@@ -41,7 +41,11 @@ def wait_for_operation(op, zone=None):
         else:
             result = service.globalOperations().get(
                 project=project, operation=op['name']).execute()
+
         if result['status'] == 'DONE':
+            if 'error' in result:
+                pprint(result['error'])
+                raise SystemExit("Operation failed")
             return
         time.sleep(2)
 
