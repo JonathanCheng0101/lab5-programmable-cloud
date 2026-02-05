@@ -10,8 +10,8 @@ from googleapiclient.errors import HttpError
 credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
 service = googleapiclient.discovery.build("compute", "v1", credentials=credentials)
 
-BASE_ZONE = "us-west1-b"
-CLONE_ZONES = ["us-west1-a", "us-west1-c", "us-west1-b"]  # try b last (stockout)
+BASE_ZONE = "us-west1-a"
+CLONE_ZONES = ["us-west1-a", "us-west1-c", "us-west1-c"]  # try b last (stockout)
 MACHINE_TYPE = "e2-medium"
 COUNT = 3
 
