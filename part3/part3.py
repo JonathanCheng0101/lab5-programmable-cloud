@@ -105,17 +105,21 @@ set -eux
 mkdir -p /srv
 cd /srv
 
-curl -sf http://metadata.google.internal/computeMetadata/v1/instance/attributes/service-credentials \
-  -H "Metadata-Flavor: Google" > service-credentials.json
+curl -sf -H "Metadata-Flavor: Google" \
+  http://metadata.google.internal/computeMetadata/v1/instance/attributes/service-credentials \
+  -o service-credentials.json
 
-curl -sf http://metadata.google.internal/computeMetadata/v1/instance/attributes/vm2-startup-script \
-  -H "Metadata-Flavor: Google" > vm2-startup-script.sh
+curl -sf -H "Metadata-Flavor: Google" \
+  http://metadata.google.internal/computeMetadata/v1/instance/attributes/vm2-startup-script \
+  -o vm2-startup-script.sh
 
-curl -sf http://metadata.google.internal/computeMetadata/v1/instance/attributes/vm1-launch-vm2 \
-  -H "Metadata-Flavor: Google" > vm1-launch-vm2.py
+curl -sf -H "Metadata-Flavor: Google" \
+  http://metadata.google.internal/computeMetadata/v1/instance/attributes/vm1-launch-vm2 \
+  -o vm1-launch-vm2.py
 
-curl -sf http://metadata.google.internal/computeMetadata/v1/instance/attributes/vm1-config \
-  -H "Metadata-Flavor: Google" > vm1-config.json
+curl -sf -H "Metadata-Flavor: Google" \
+  http://metadata.google.internal/computeMetadata/v1/instance/attributes/vm1-config \
+  -o vm1-config.json
 
 apt-get update -y
 apt-get install -y python3 python3-pip
