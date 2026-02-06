@@ -15,6 +15,8 @@ CLONE_ZONES = ["us-west1-a", "us-west1-c", "us-west1-c"]  # try b last (stockout
 MACHINE_TYPE = "e2-medium"
 COUNT = 3
 
+TAGS = ["allow-5000"]
+
 
 def list_instances(compute, project, zone):
     result = compute.instances().list(project=project, zone=zone).execute()
@@ -80,6 +82,7 @@ def main():
                 body = {
                     "name": clone_name,
                     "machineType": f"zones/{z}/machineTypes/{MACHINE_TYPE}",
+                    "tags": {"items": TAGS},  
                     "disks": [{
                         "boot": True,
                         "autoDelete": True,
