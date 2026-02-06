@@ -30,7 +30,7 @@ if [ -d flask-tutorial/.git ]; then
   git pull
 else
   rm -rf flask-tutorial
-  git clone https://github.com/cu-csci-4253-datacenter/flask-tutorial
+  test -d flask-tutorial || git clone https://github.com/cu-csci-4253-datacenter/flask-tutorial
   cd flask-tutorial
 fi
 
