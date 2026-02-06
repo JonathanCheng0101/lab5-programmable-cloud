@@ -7,7 +7,7 @@ import time
 import googleapiclient.discovery
 import google.oauth2.service_account as service_account
 
-BASE_ZONE = "us-west1-b"
+BASE_ZONE = "us-west1-a"
 IMAGE_PROJECT = "debian-cloud"
 IMAGE_FAMILY = "debian-12"
 MACHINE_TYPE_VM1 = "e2-medium"
