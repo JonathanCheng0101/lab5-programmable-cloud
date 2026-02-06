@@ -21,16 +21,26 @@ STARTUP_SCRIPT = """#!/bin/bash
 set -e
 mkdir -p /opt/app
 cd /opt/app
+
 apt-get update
 apt-get install -y python3 python3-pip git
-git clone https://github.com/cu-csci-4253-datacenter/flask-tutorial
-cd flask-tutorial
+
+if [ -d flask-tutorial/.git ]; then
+  cd flask-tutorial
+  git pull
+else
+  rm -rf flask-tutorial
+  git clone https://github.com/cu-csci-4253-datacenter/flask-tutorial
+  cd flask-tutorial
+fi
+
 python3 setup.py install
 pip3 install -e .
 export FLASK_APP=flaskr
 flask init-db
 nohup flask run -h 0.0.0.0 -p 5000 &
 """
+
 
 
 def list_instances(compute, project, zone):
