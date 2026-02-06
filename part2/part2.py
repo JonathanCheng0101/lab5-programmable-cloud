@@ -11,11 +11,26 @@ credentials, project = google.auth.default(scopes=["https://www.googleapis.com/a
 service = googleapiclient.discovery.build("compute", "v1", credentials=credentials)
 
 BASE_ZONE = "us-west1-a"
-CLONE_ZONES = ["us-west1-a", "us-west1-c", "us-west1-c"]  # try b last (stockout)
+CLONE_ZONES = ["us-west1-a", "us-west1-c", "us-west1-c"]
 MACHINE_TYPE = "e2-medium"
 COUNT = 3
 
 TAGS = ["allow-5000"]
+
+STARTUP_SCRIPT = """#!/bin/bash
+set -e
+mkdir -p /opt/app
+cd /opt/app
+apt-get update
+apt-get install -y python3 python3-pip git
+git clone https://github.com/cu-csci-4253-datacenter/flask-tutorial
+cd flask-tutorial
+python3 setup.py install
+pip3 install -e .
+export FLASK_APP=flaskr
+flask init-db
+nohup flask run -h 0.0.0.0 -p 5000 &
+"""
 
 
 def list_instances(compute, project, zone):
@@ -52,7 +67,6 @@ def main():
     for inst in list_instances(service, project, BASE_ZONE):
         print(inst["name"])
 
-    # ---- 1) Create snapshot from the Part 1 instance boot disk (disk interface: disks.createSnapshot) ----
     inst = service.instances().get(project=project, zone=BASE_ZONE, instance=base_instance).execute()
     boot_disk_url = inst["disks"][0]["source"]
     disk_name = re.search(r"/disks/([^/]+)$", boot_disk_url).group(1)
@@ -70,7 +84,6 @@ def main():
         wait_zone_op(op["name"], BASE_ZONE)
         snap_link = service.snapshots().get(project=project, snapshot=snapshot_name).execute()["selfLink"]
 
-    # ---- 2) Create three instances from snapshot + measure time to RUNNING ----
     results = []
     for i in range(1, COUNT + 1):
         clone_name = f"{base_instance}-clone-{i}"
@@ -82,7 +95,7 @@ def main():
                 body = {
                     "name": clone_name,
                     "machineType": f"zones/{z}/machineTypes/{MACHINE_TYPE}",
-                    "tags": {"items": TAGS},  
+                    "tags": {"items": TAGS},
                     "disks": [{
                         "boot": True,
                         "autoDelete": True,
@@ -92,6 +105,12 @@ def main():
                         "network": "global/networks/default",
                         "accessConfigs": [{"name": "External NAT", "type": "ONE_TO_ONE_NAT"}],
                     }],
+                    "metadata": {
+                        "items": [{
+                            "key": "startup-script",
+                            "value": STARTUP_SCRIPT
+                        }]
+                    },
                 }
 
                 op = service.instances().insert(project=project, zone=z, body=body).execute()
@@ -109,7 +128,6 @@ def main():
         if last_err:
             raise RuntimeError(f"Failed to create {clone_name} in all zones. Last error: {last_err}")
 
-    # ---- 3) Write TIMING.md ----
     with open("TIMING.md", "w", encoding="utf-8") as f:
         f.write("# VM Clone Timing\n\n")
         f.write(f"Base instance: `{base_instance}`  \n")
