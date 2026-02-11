@@ -8,7 +8,7 @@ import google.auth
 credentials, project = google.auth.default()
 service = googleapiclient.discovery.build('compute', 'v1', credentials=credentials)
 
-ZONE = 'us-west1-b'# us-west1-a
+ZONE = 'us-west1-a'# us-west1-b
 INSTANCE_NAME = 'flask-vm'
 MACHINE_TYPE = 'f1-micro'   #  e2-standard-2
 
