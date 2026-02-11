@@ -7,9 +7,9 @@ import google.auth
 credentials, project = google.auth.default()
 service = googleapiclient.discovery.build('compute', 'v1', credentials=credentials)
 
-ZONE = 'us-west1-a'
+ZONE = 'us-west1-b'# us-west1-a
 INSTANCE_NAME = 'flask-vm'
-MACHINE_TYPE = 'e2-standard-2'   #  f1-micro
+MACHINE_TYPE = 'f1-micro'   #  e2-standard-2
 
 STARTUP_SCRIPT = """#!/bin/bash
 set -e
@@ -26,9 +26,6 @@ flask init-db
 nohup flask run -h 0.0.0.0 -p 5000 &
 """
 
-#
-# Stub code - just lists all instances
-#
 def list_instances(compute, project, zone):
     result = compute.instances().list(project=project, zone=zone).execute()
     return result['items'] if 'items' in result else []
@@ -100,16 +97,30 @@ def create_instance():
         project=project, zone=ZONE, body=config).execute()
     wait_for_operation(op, ZONE)
 
-def get_external_ip():
-    inst = service.instances().get(
-        project=project, zone=ZONE, instance=INSTANCE_NAME).execute()
-    for nic in inst['networkInterfaces']:
-        for ac in nic.get('accessConfigs', []):
-            if 'natIP' in ac:
-                return ac['natIP']
-    return None
+def wait_for_external_ip(timeout=120):
+    print("Waiting for external IP...")
+    start = time.time()
 
-print("Your running instances are:")
+    while True:
+        inst = service.instances().get(
+            project=project,
+            zone=ZONE,
+            instance=INSTANCE_NAME
+        ).execute()
+
+        for nic in inst['networkInterfaces']:
+            for ac in nic.get('accessConfigs', []):
+                if 'natIP' in ac:
+                    return ac['natIP']
+
+        # timeout check
+        if time.time() - start > timeout:
+            raise RuntimeError("Timeout waiting for external IP")
+
+        time.sleep(5)
+
+
+print("running instances are:")
 for instance in list_instances(service, project, ZONE):
     print(instance['name'])
 
@@ -117,5 +128,5 @@ create_firewall_rule()
 create_instance()
 
 ip = get_external_ip()
-print("\nVisit:")
+print("\nNow  go to:")
 print(f"http://{ip}:5000")
