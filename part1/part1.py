@@ -119,6 +119,17 @@ def wait_for_external_ip(timeout=120):
 
         time.sleep(5)
 
+def wait_for_port(ip, port=5000, timeout=300):
+    print(f"Waiting for {ip}:{port} ...")
+    start = time.time()
+    while True:
+        try:
+            with socket.create_connection((ip, port), timeout=3):
+                return
+        except OSError:
+            if time.time() - start > timeout:
+                raise RuntimeError(f"Timeout waiting for {ip}:{port}")
+            time.sleep(3)
 
 print("running instances are:")
 for instance in list_instances(service, project, ZONE):
@@ -128,5 +139,6 @@ create_firewall_rule()
 create_instance()
 
 ip = wait_for_external_ip()
-print("\nNow  go to:")
+wait_for_port(ip, 5000, timeout=300)
+print("\nAll set! Now  go to:")
 print(f"http://{ip}:5000")
