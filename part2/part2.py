@@ -12,7 +12,7 @@ service = googleapiclient.discovery.build("compute", "v1", credentials=credentia
 
 BASE_ZONE = "us-west1-b"
 CLONE_ZONES = ["us-west1-a", "us-west1-b", "us-west1-c"]
-MACHINE_TYPE = "e2-medium" #f1-micro
+MACHINE_TYPE = "f1-micro" #e2-medium
 COUNT = 3
 
 TAGS = ["allow-5000"]
