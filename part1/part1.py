@@ -127,6 +127,6 @@ for instance in list_instances(service, project, ZONE):
 create_firewall_rule()
 create_instance()
 
-ip = get_external_ip()
+ip = wait_for_external_ip()
 print("\nNow  go to:")
 print(f"http://{ip}:5000")
