@@ -10,9 +10,9 @@ from googleapiclient.errors import HttpError
 credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
 service = googleapiclient.discovery.build("compute", "v1", credentials=credentials)
 
-BASE_ZONE = "us-west1-a"
-CLONE_ZONES = ["us-west1-a", "us-west1-c", "us-west1-c"]
-MACHINE_TYPE = "e2-medium"
+BASE_ZONE = "us-west1-b"
+CLONE_ZONES = ["us-west1-a", "us-west1-b", "us-west1-c"]
+MACHINE_TYPE = "e2-medium" #f1-micro
 COUNT = 3
 
 TAGS = ["allow-5000"]
@@ -68,12 +68,12 @@ def wait_running(zone, instance_name):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--instance", required=True, help="Part 1 instance name (e.g., flask-vm)")
+    parser.add_argument("--instance", required=True, help="Part 1 instance name (flask-vm)")
     args = parser.parse_args()
     base_instance = args.instance
     snapshot_name = f"base-snapshot-{base_instance}"
 
-    print("Your running instances are:")
+    print("Running instances are:")
     for inst in list_instances(service, project, BASE_ZONE):
         print(inst["name"])
 
