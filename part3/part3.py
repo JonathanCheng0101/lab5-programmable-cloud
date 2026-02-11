@@ -9,7 +9,6 @@ import google.oauth2.service_account as service_account
 
 BASE_ZONE = "us-west1-a"
 
-# Match Part1 environment to avoid pip/PEP668 issues
 IMAGE_PROJECT = "ubuntu-os-cloud"
 IMAGE_FAMILY = "ubuntu-2204-lts"
 
@@ -18,9 +17,7 @@ MACHINE_TYPE_VM2 = "e2-medium"
 SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
 
-# -------------------------
-# VM-2 startup: same method as Part1 (git clone flask-tutorial)
-# -------------------------
+# VM-2 startup: same method as Part1 
 VM2_STARTUP = r"""#!/bin/bash
 set -eux
 
@@ -44,9 +41,7 @@ nohup flask run -h 0.0.0.0 -p 5000 >/var/log/flask.log 2>&1 &
 """
 
 
-# -------------------------
 # VM-1 launcher (runs on VM1): creates VM-2 using explicit SA key on VM1
-# -------------------------
 VM1_LAUNCH_VM2 = r"""#!/usr/bin/env python3
 import json, time
 import googleapiclient.discovery
@@ -106,9 +101,7 @@ if __name__ == "__main__":
 """
 
 
-# -------------------------
 # VM-1 startup (runs automatically on VM1): pulls metadata files and runs launcher
-# -------------------------
 VM1_STARTUP = r"""#!/bin/bash
 set -eux
 
@@ -200,7 +193,7 @@ def main():
         "metadata": {
             "items": [
                 {"key": "startup-script", "value": VM1_STARTUP},
-                # pass files into VM1 via metadata so VM1 can retrieve them
+                # pass files into VM1 via metadata so VM1 can retrieve them and automatically do the rest
                 {"key": "service-credentials", "value": open("service-credentials.json").read()},
                 {"key": "vm2-startup-script", "value": VM2_STARTUP},
                 {"key": "vm1-launch-vm2", "value": VM1_LAUNCH_VM2},
@@ -212,7 +205,7 @@ def main():
     op = compute.instances().insert(project=project, zone=args.zone, body=body).execute()
     wait_zone_op(compute, project, args.zone, op["name"])
     print("VM-1 created:", args.instance, "-> VM-2:", vm1_cfg["vm2_name"])
-    print("Next: wait ~1-2 minutes, then open VM-2 external IP on :5000")
+    print("Next: wait for 1-2 minutes, then open VM-2 external IP on :5000")
 
 
 if __name__ == "__main__":
